@@ -19,6 +19,36 @@ per-period charges (documents), receipt links, and payment history.
 pip install pydmvl
 ```
 
+## Usage
+
+```python
+from pydmvl import DmvlClient
+
+with DmvlClient() as client:
+    session = client.login("user", "secret")
+    print(session.personal_account.amount_due)
+```
+
+## TLS verification (disabled by default)
+
+The service presents an **incomplete certificate chain** (it does not serve the
+intermediate CA), so standard verification fails against the real endpoint with
+`certificate verify failed: unable to get local issuer certificate`. The
+official client disables verification for this reason, and `pydmvl` matches
+that observed behavior: `verify` defaults to `False`.
+
+This is a deliberate, documented default, not a silent downgrade. Whenever you
+can, turn verification back on — pass a CA bundle that includes the missing
+intermediate, or `verify=True` if your trust store already chains the
+certificate:
+
+```python
+DmvlClient(verify="/path/to/ca-bundle.pem")
+```
+
+Consumers that expose TLS settings to end users should present this as an
+explicit opt-in control. See [spec 0004](specs/0004-client-api.md) R8.
+
 ## Status
 
 Authentication, the account snapshot, documents (charges, receipts, unpaid
@@ -35,6 +65,7 @@ Capabilities:
 - Per-period charges and receipt links — [spec 0002](specs/0002-documents.md)
 - Payment history and the latest payment — [spec 0003](specs/0003-payments.md)
 - Public sync + async client API — [spec 0004](specs/0004-client-api.md)
+- Configurable TLS verification (default off; see below) — [spec 0004](specs/0004-client-api.md) R8
 
 ### Known API surface
 

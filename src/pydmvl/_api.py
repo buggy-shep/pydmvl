@@ -22,6 +22,14 @@ API_PATH = "api.php"
 ACTION_AUTHENTICATION = "authentication"
 DEFAULT_TIMEOUT_SECONDS = 30.0
 
+# The service presents an incomplete TLS chain (it omits the GlobalSign
+# intermediate), so strict verification fails against the real endpoint. TLS
+# verification therefore defaults to off, matching the observed client
+# behavior; consumers that can supply a CA bundle or that trust their network
+# may enable it explicitly (spec 0004 R8). This is opt-out, not a silent
+# downgrade: the default is documented and overridable.
+DEFAULT_VERIFY: bool = False
+
 
 def auth_params(credentials: Credentials, version: str | None) -> dict[str, str]:
     """Build the query parameters for the authentication action (spec 0001)."""

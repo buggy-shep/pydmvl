@@ -26,8 +26,8 @@ same models and semantics.
   `login(login, password)`, `fetch()`, `logout()`, `close()`. The async client
   additionally supports `async with` (closing on exit); the sync client
   supports `with`.
-- R3 (MUST) Both clients accept `base_url`, `version`, `transport`, and
-  `timeout` keyword arguments with the same defaults as spec 0001.
+- R3 (MUST) Both clients accept `base_url`, `version`, `transport`, `timeout`,
+  and `verify` keyword arguments with the same defaults as spec 0001.
 - R4 (MUST) Errors: `DmvlError` (base), `AuthError` (authentication), `ApiError`
   (HTTP status or malformed body, carrying `.status`).
 - R5 (MUST) The package root exports the full public API and `__version__`; a
@@ -39,6 +39,15 @@ same models and semantics.
   URLs, and installs a redaction filter on the `httpx` logger so the same holds
   for request-URL records emitted by the dependency. The library's own log
   statements are debug-level and contain no request data.
+- R8 (MUST) TLS verification is configurable through the `verify` keyword
+  argument (accepted values as in `httpx`: `bool` or a CA-bundle path) and
+  **defaults to `False`**. Rationale: the service presents an incomplete
+  certificate chain, so strict verification fails against the real endpoint;
+  the observed client disables verification for the same reason. The default is
+  documented in the README together with the caveat that callers should enable
+  verification when they can (for example with a CA bundle). A consumer that
+  exposes TLS settings to end users must surface this as an explicit opt-in
+  control rather than hiding it.
 
 ## Design
 

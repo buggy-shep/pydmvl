@@ -10,6 +10,7 @@ from ._api import (
     API_PATH,
     DEFAULT_BASE_URL,
     DEFAULT_TIMEOUT_SECONDS,
+    DEFAULT_VERIFY,
     auth_params,
     parse_authentication_response,
 )
@@ -34,8 +35,11 @@ class DmvlClient:
         version: str | None = None,
         transport: httpx.BaseTransport | None = None,
         timeout: float = DEFAULT_TIMEOUT_SECONDS,
+        verify: bool | str = DEFAULT_VERIFY,
     ) -> None:
-        self._client = httpx.Client(base_url=base_url, transport=transport, timeout=timeout)
+        self._client = httpx.Client(
+            base_url=base_url, transport=transport, timeout=timeout, verify=verify
+        )
         self._version = version
         self._credentials: Credentials | None = None
 

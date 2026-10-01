@@ -104,6 +104,10 @@ A feature branch may merge into `master` only when both hold:
   hash. The library installs a redaction filter on the `httpx` logger so
   dependency-emitted request-URL records have `login` and `hash` replaced; do
   not remove it.
+- TLS verification defaults to `False` (`DEFAULT_VERIFY`) because the service
+  serves an incomplete certificate chain; the `verify` argument stays
+  overridable and the rationale is documented in the README and spec 0004 R8.
+  Do not remove the argument or change the default without updating both.
 
 ## 9. Publication policy (public repository)
 
