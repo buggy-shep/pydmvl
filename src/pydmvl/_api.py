@@ -10,9 +10,12 @@ from typing import Any
 
 import httpx
 
+from ._logging import install_httpx_redaction
 from .auth import Credentials
 from .errors import ApiError, AuthError
 from .models import Session, parse_session
+
+install_httpx_redaction()
 
 DEFAULT_BASE_URL = "https://houseb.ru/api/"
 API_PATH = "api.php"

@@ -42,6 +42,20 @@ def test_account_summary_has_debt_rule() -> None:
     assert summary.payment_purpose == "for utilities"
 
 
+def test_has_debt_false_when_no_current_debt() -> None:
+    payload = synthetic_session_payload()
+    payload["personal_account"]["all_debt_c"] = "0.00"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.personal_account.has_debt is False
+
+
+def test_whitespace_amount_defaults_to_zero() -> None:
+    payload = synthetic_session_payload()
+    payload["history_charges"][0]["ist_lgot"] = "   "
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.charges[0].benefit == Decimal(0)
+
+
 def test_receipts_include_both_kinds() -> None:
     session = _client_for(synthetic_session_payload()).login(LOGIN, PASSWORD)
     kinds = sorted(receipt.kind for receipt in session.receipts)

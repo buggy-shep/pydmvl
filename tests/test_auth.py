@@ -110,3 +110,11 @@ def test_malformed_body_raises_api_error() -> None:
 
     with pytest.raises(ApiError):
         make_client(handler).login(LOGIN, PASSWORD)
+
+
+def test_missing_personal_account_raises_api_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return json_response({"name": "Example account"})
+
+    with pytest.raises(ApiError):
+        make_client(handler).login(LOGIN, PASSWORD)

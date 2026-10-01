@@ -76,9 +76,10 @@ Not applicable: this spec defines no public API of its own.
 
 ## Test plan
 
-- The catalogue is documentation; a test asserts that the implemented scope in
-  `Session` does not reference unimplemented actions.
-- Coverage changes are reviewed with the accompanying spec.
+- The catalogue is documentation; coverage changes are reviewed with the
+  accompanying spec and the implementation that supports them.
+- New actions are added together with their spec, tests, and implementation,
+  or explicitly marked out of scope here.
 
 ## Acceptance criteria
 

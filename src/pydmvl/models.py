@@ -23,7 +23,7 @@ def parse_decimal(value: Any, field: str, *, default: Decimal | None = None) -> 
     Missing or blank values return ``default`` when one is given; otherwise a
     ``ValueError`` is raised. Booleans and non-numeric values are rejected.
     """
-    if value is None or value == "":
+    if value is None or (isinstance(value, str) and not value.strip()):
         if default is not None:
             return default
         raise ValueError(f"field {field!r} is missing")

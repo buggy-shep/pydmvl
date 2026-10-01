@@ -59,3 +59,25 @@ def test_non_numeric_payment_amount_raises_api_error() -> None:
     payload["personal_account"]["payments"][0]["fo_sum"] = "not-a-number"
     with pytest.raises(ApiError):
         _client_for(payload).login(LOGIN, PASSWORD)
+
+
+def test_non_numeric_outstanding_amount_raises_api_error() -> None:
+    payload = synthetic_session_payload()
+    payload["payments"][0]["sum"] = "not-a-number"
+    with pytest.raises(ApiError):
+        _client_for(payload).login(LOGIN, PASSWORD)
+
+
+def test_non_list_payment_history_is_empty() -> None:
+    payload = synthetic_session_payload()
+    payload["personal_account"]["payments"] = "not-a-list"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.personal_account.payments == ()
+    assert session.last_payment is None
+
+
+def test_non_list_outstanding_payments_is_empty() -> None:
+    payload = synthetic_session_payload()
+    payload["payments"] = {"unexpected": "object"}
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.outstanding == ()

@@ -35,8 +35,10 @@ same models and semantics.
   `pyproject.toml`.
 - R6 (MUST) The runtime dependency floor is `httpx>=0.27`, compatible with the
   version pinned by Home Assistant; a test guards the floor.
-- R7 (SHOULD) The library logs at debug level only and never logs credentials,
-  the password hash, or request URLs.
+- R7 (MUST) The library never logs credentials, the password hash, or request
+  URLs, and installs a redaction filter on the `httpx` logger so the same holds
+  for request-URL records emitted by the dependency. The library's own log
+  statements are debug-level and contain no request data.
 
 ## Design
 

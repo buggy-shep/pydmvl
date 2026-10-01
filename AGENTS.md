@@ -101,7 +101,9 @@ A feature branch may merge into `master` only when both hold:
   or gitignored `*.local.json` files.
 - Authentication material is sent as request query parameters (an observed
   property of the API). Never log request URLs, credentials, or the password
-  hash.
+  hash. The library installs a redaction filter on the `httpx` logger so
+  dependency-emitted request-URL records have `login` and `hash` replaced; do
+  not remove it.
 
 ## 9. Publication policy (public repository)
 
