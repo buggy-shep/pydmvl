@@ -1,0 +1,74 @@
+{
+  "login": "user@example.com",
+  "hash": "00000000000000000000000000000000",
+  "name": "Example account",
+  "db": "kp_example",
+  "mgfkey": "<mgfkey>",
+  "personal_account": {
+    "all_debt_b": "100.00",
+    "all_debt_c": "150.50",
+    "all_debt_e": "0.00",
+    "all_nach": "4000.00",
+    "all_opl": "3849.50",
+    "all_raz": "150.50",
+    "fun_date": "01.10.2026",
+    "textOplUsl": "for utilities",
+    "payments": [
+      { "fo_date": "05.09.2026", "fo_sum": "2000.00" },
+      { "fo_date": "10.10.2026", "fo_sum": "1849.50" }
+    ]
+  },
+  "history_charges": [
+    {
+      "ist_date": "09.2026",
+      "ist_nach": "1800.00",
+      "ist_nach100": "1800.00",
+      "ist_lgot": "0",
+      "ist_raz": "0",
+      "ist_opl": "1800.00",
+      "ist_debt_b": "100.00",
+      "ist_debt_e": "100.00"
+    },
+    {
+      "ist_date": "10.2026",
+      "ist_nach": "2200.00",
+      "ist_nach100": "2200.00",
+      "ist_lgot": "0",
+      "ist_raz": "150.50",
+      "ist_opl": "0.00",
+      "ist_debt_b": "100.00",
+      "ist_debt_e": "250.50"
+    }
+  ],
+  "bills": [
+    {
+      "name": "September 2026",
+      "link": "https://example.invalid/kvit/kvitpdfmp_kp.php?fls=<fls>&org=<db>&key=<key>"
+    }
+  ],
+  "cap_bills": [
+    {
+      "name": "Capital repair 09.2026",
+      "link": "https://example.invalid/kvit/kvitpdfmpkr.php?fls=<fls>&org=<db>&key=<key>"
+    }
+  ],
+  "payments": [{ "sum": "2200.00", "tax": "0.00" }],
+  "counters": [
+    {
+      "sch_id": "<sch_id>",
+      "sch_name": "<sch_name>",
+      "st_name": "cold water",
+      "sch_date_c": "01.01.2026",
+      "values": [
+        {
+          "sp_date_b": "01.09.2026",
+          "sp_date_e": "30.09.2026",
+          "sp_pok": "123",
+          "sp_val": "5",
+          "sp_type": "water",
+          "isActual": true
+        }
+      ]
+    }
+  ]
+}
