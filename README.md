@@ -3,15 +3,30 @@
 [![PyPI version](https://img.shields.io/pypi/v/pydmvl.svg)](https://pypi.org/project/pydmvl/)
 [![CI](https://github.com/buggy-shep/pydmvl/actions/workflows/ci.yml/badge.svg)](https://github.com/buggy-shep/pydmvl/actions/workflows/ci.yml)
 
-Unofficial Python client for a homeowner ("Domovladelets") account API. It
-authenticates with an account login and password and exposes the account
+Unofficial Python client for the **"Domovladelets+"** ("Домовладелец+",
+homeowner) account API. It implements the protocol used by the app
+([Google Play](https://play.google.com/store/apps/details?id=com.homeowner)):
+it authenticates with an account login and password and exposes the account
 snapshot the service returns for its home screen: account aggregates,
 per-period charges (documents), receipt links, and payment history.
 
+Неофициальный Python-клиент API лицевого счёта приложения **«Домовладелец+»**.
+Реализует протокол этого приложения
+([Google Play](https://play.google.com/store/apps/details?id=com.homeowner)):
+аутентифицируется по логину и паролю лицевого счёта и предоставляет снимок
+счёта, который сервис возвращает для главного экрана: агрегаты по счёту,
+начисления за период (документы), ссылки на квитанции и историю платежей.
+
 > **Disclaimer.** This project is unofficial and is not affiliated with,
-> endorsed by, or sponsored by the "Domovladelets" application or its
+> endorsed by, or sponsored by the "Domovladelets+" application or its
 > operators. It is built for interoperability with your own account. Use it at
 > your own risk; only access accounts you are authorized to access.
+
+> **Отказ от ответственности.** Проект неофициальный и не связан с
+> приложением «Домовладелец+» или его операторами, не одобрен и не
+> спонсируется ими. Он создан для взаимодействия с вашим собственным лицевым
+> счётом. Используйте его на свой риск; получайте доступ только к тем счетам,
+> на которые у вас есть разрешение.
 
 ## Install
 
