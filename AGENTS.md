@@ -21,9 +21,10 @@ domain `dmvl`.
 ## 2. Language
 
 All repository text is English: code, comments, docstrings, documentation,
-commit messages, and review notes. The only exception is runtime translation
-of user-facing strings (e.g. `translations/ru.json`) in the consumer
-integration, not in this library.
+commit messages, and review notes. The only exceptions are a short bilingual
+intro and disclaimer in this repository's `README.md` (the app audience is
+Russian-speaking) and runtime translation of user-facing strings (e.g.
+`translations/ru.json`) in the consumer integration, not in this library.
 
 ## 3. Stack and commands
 
