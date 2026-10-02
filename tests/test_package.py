@@ -7,6 +7,7 @@ from pathlib import Path
 import pydmvl
 
 PUBLIC_API = {
+    "AccountInfo",
     "AccountSummary",
     "ApiError",
     "AsyncDmvlClient",

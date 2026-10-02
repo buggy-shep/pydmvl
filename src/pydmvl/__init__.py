@@ -10,6 +10,7 @@ from .auth import Credentials, password_hash
 from .client import DmvlClient
 from .errors import ApiError, AuthError, DmvlError
 from .models import (
+    AccountInfo,
     AccountSummary,
     Charge,
     OutstandingPayment,
@@ -18,9 +19,10 @@ from .models import (
     Session,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
+    "AccountInfo",
     "AccountSummary",
     "ApiError",
     "AsyncDmvlClient",

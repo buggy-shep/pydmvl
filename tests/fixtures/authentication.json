@@ -14,8 +14,14 @@
     "fun_date": "01.10.2026",
     "textOplUsl": "for utilities",
     "payments": [
-      { "fo_date": "05.09.2026", "fo_sum": "2000.00" },
-      { "fo_date": "10.10.2026", "fo_sum": "1849.50" }
+      {
+        "fo_date": "05.09.2026",
+        "fo_sum": "2000.00"
+      },
+      {
+        "fo_date": "10.10.2026",
+        "fo_sum": "1849.50"
+      }
     ]
   },
   "history_charges": [
@@ -52,7 +58,12 @@
       "link": "https://example.invalid/kvit/kvitpdfmpkr.php?fls=<fls>&org=<db>&key=<key>"
     }
   ],
-  "payments": [{ "sum": "2200.00", "tax": "0.00" }],
+  "payments": [
+    {
+      "sum": "2200.00",
+      "tax": "0.00"
+    }
+  ],
   "counters": [
     {
       "sch_id": "<sch_id>",
@@ -70,5 +81,24 @@
         }
       ]
     }
-  ]
+  ],
+  "dev_email": "support@example.invalid",
+  "memail": "resident@example.invalid",
+  "fls_fio": "<full name>",
+  "maddr": "Example street, 1",
+  "mflat": "  42 ",
+  "usersInfo": {
+    "email": "resident@example.invalid",
+    "phone": "<phone>",
+    "agreement": []
+  },
+  "contact": {
+    "persons": [],
+    "messages": []
+  },
+  "settings": {
+    "show_counters": 1,
+    "first_day_counters_values": 15
+  },
+  "news": []
 }

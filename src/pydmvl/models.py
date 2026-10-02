@@ -1,4 +1,4 @@
-"""Parsed account models and pure payload parsers (specs 0002, 0003).
+"""Parsed account models and pure payload parsers (specs 0002, 0003, 0007).
 
 All parsers are pure and raise ``ValueError``/``KeyError``/``TypeError`` on
 malformed input; the client maps those to :class:`~pydmvl.errors.ApiError`
@@ -7,7 +7,8 @@ with the HTTP status attached. Amounts are kept as :class:`decimal.Decimal`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -120,6 +121,35 @@ class AccountSummary:
 
 
 @dataclass(frozen=True)
+class AccountInfo:
+    """Account-screen metadata from the authentication response (spec 0007).
+
+    All fields are optional and parsed defensively. ``raw`` is the full parsed
+    response body, so callers can reach a field not yet modelled; it contains
+    the server-returned ``hash`` and must never be logged or published.
+    """
+
+    organization: str | None
+    database: str | None
+    developer_email: str | None
+    contact_email: str | None
+    address: str | None
+    flat: str | None
+    management_key: str | None
+    full_name: str | None
+    phone: str | None
+    contact: Mapping[str, Any] | None
+    settings: Mapping[str, Any]
+    charges: int
+    receipts: int
+    counters: int
+    payments: int
+    news: int
+    # Excluded from repr: it holds the server `hash` and other account data.
+    raw: Mapping[str, Any] = field(repr=False)
+
+
+@dataclass(frozen=True)
 class Session:
     """The account snapshot returned by the authentication action (spec 0004)."""
 
@@ -130,6 +160,8 @@ class Session:
     charges: tuple[Charge, ...]
     receipts: tuple[Receipt, ...]
     outstanding: tuple[OutstandingPayment, ...]
+    # Excluded from repr: repr(AccountInfo) already excludes the raw payload.
+    account: AccountInfo = field(repr=False)
 
     @property
     def last_payment(self) -> Payment | None:
@@ -203,6 +235,41 @@ def parse_account_summary(payload: Any) -> AccountSummary:
     )
 
 
+def parse_account_info(
+    payload: Any,
+    *,
+    charges: tuple[Charge, ...],
+    receipts: tuple[Receipt, ...],
+) -> AccountInfo:
+    """Parse the account-screen metadata from an authentication payload (0007)."""
+    obj = _object(payload, "response")
+    raw_settings = obj.get("settings")
+    settings = raw_settings if isinstance(raw_settings, dict) else {}
+    users = obj.get("usersInfo")
+    users_obj = users if isinstance(users, dict) else {}
+    contact = obj.get("contact")
+    flat = _optional_str(obj.get("mflat"))
+    return AccountInfo(
+        organization=_optional_str(obj.get("name")),
+        database=_optional_str(obj.get("db")),
+        developer_email=_optional_str(obj.get("dev_email")),
+        contact_email=_optional_str(obj.get("memail")),
+        address=_optional_str(obj.get("maddr")),
+        flat=flat.strip() if flat else flat,
+        management_key=_optional_str(obj.get("mgfkey")),
+        full_name=_optional_str(obj.get("fls_fio")),
+        phone=_optional_str(users_obj.get("phone")),
+        contact=contact if isinstance(contact, dict) else None,
+        settings=dict(settings),
+        charges=len(charges),
+        receipts=len(receipts),
+        counters=len(_objects(obj.get("counters"))),
+        payments=len(_objects(obj.get("payments"))),
+        news=len(_objects(obj.get("news"))),
+        raw=obj,
+    )
+
+
 def parse_session(payload: Any, *, login: str) -> Session:
     """Parse an authentication response body into a :class:`Session`.
 
@@ -217,6 +284,7 @@ def parse_session(payload: Any, *, login: str) -> Session:
         *_parse_receipts(obj.get("cap_bills"), kind=RECEIPT_KIND_CAPITAL_REPAIR),
     ]
     outstanding = tuple(parse_outstanding_payment(entry) for entry in _objects(obj.get("payments")))
+    account = parse_account_info(payload, charges=charges, receipts=tuple(receipts))
     return Session(
         login=login,
         name=_optional_str(obj.get("name")),
@@ -225,4 +293,5 @@ def parse_session(payload: Any, *, login: str) -> Session:
         charges=charges,
         receipts=tuple(receipts),
         outstanding=outstanding,
+        account=account,
     )
