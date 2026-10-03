@@ -41,7 +41,8 @@ from pydmvl import DmvlClient
 
 with DmvlClient() as client:
     session = client.login("user", "secret")
-    print(session.personal_account.amount_due)
+    print(session.personal_account.debt_current)
+    print(session.has_unpaid_documents, session.last_payment)
 ```
 
 ## TLS verification (disabled by default)

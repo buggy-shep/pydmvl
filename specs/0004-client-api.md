@@ -21,7 +21,8 @@ same models and semantics.
 - R1 (MUST) `Session` exposes `login`, `name`, `database`,
   `personal_account: AccountSummary`, `charges: tuple[Charge, ...]`,
   `receipts: tuple[Receipt, ...]`, `outstanding: tuple[OutstandingPayment,
-  ...]`, plus the derived `has_unpaid_documents` and `last_payment`.
+  ...]`, `counters: tuple[Counter, ...]`, `account: AccountInfo`, plus the
+  derived `has_unpaid_documents` and `last_payment` (spec 0009 R1).
 - R2 (MUST) `DmvlClient` and `AsyncDmvlClient` expose the same methods:
   `login(login, password)`, `fetch()`, `payment_segments()`, `logout()`,
   `close()`. The async client additionally supports `async with` (closing on

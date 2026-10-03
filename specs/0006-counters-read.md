@@ -25,7 +25,8 @@ without committing to writing readings.
   - `service` — `st_name`; `checked` — verification date (`sch_date_c`).
 - R2 (MUST) Parse `values[]` into `CounterReading(period_start, period_end,
   reading, volume, kind, is_actual)` from `sp_date_b`, `sp_date_e`, `sp_pok`,
-  `sp_val`, `sp_type`, `isActual`.
+  `sp_val`, `sp_type`, `isActual`. `isActual` is coerced by spec 0009 R3 so a
+  non-bool encoding (`1`, `"true"`) is not read as false.
 - R3 (MUST) `Counter.current_reading` returns the reading whose `is_actual` is
   true, or `None`.
 - R4 (MUST) Reading is strictly read-only; submitting or deleting a reading
@@ -86,3 +87,6 @@ class Counter:
 `Counter`/`CounterReading` exported from the package; `Counter.current_reading`
 selects the actual reading; missing values degrade to zero/`None`; version
 0.3.0.
+
+Amended by spec 0009 R3 (2026-10-03): `isActual` is coerced from booleans,
+integers and the strings `"true"`/`"1"` instead of a strict `is True` check.

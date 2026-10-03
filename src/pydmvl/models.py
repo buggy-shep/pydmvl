@@ -1,4 +1,4 @@
-"""Parsed account models and pure payload parsers (specs 0002, 0003, 0006, 0007, 0008).
+"""Parsed account models and pure payload parsers (specs 0002, 0003, 0006-0009).
 
 All parsers are pure and raise ``ValueError``/``KeyError``/``TypeError`` on
 malformed input; the client maps those to :class:`~pydmvl.errors.ApiError`
@@ -46,6 +46,25 @@ def _optional_int(value: Any) -> int | None:
     if isinstance(value, bool) or not isinstance(value, int):
         return None
     return value
+
+
+_TRUTHY_STRINGS = frozenset({"true", "1"})
+
+
+def parse_flag(value: Any) -> bool:
+    """Coerce a JSON boolean flag to ``bool`` (spec 0009 R3).
+
+    Accepts real booleans, integers (zero is false, any other integer true), and
+    the strings ``"true"``/``"1"`` (case-insensitive, trimmed). Any other type
+    or value degrades to ``False``, so a malformed flag never flips on.
+    """
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in _TRUTHY_STRINGS
+    return False
 
 
 def _object(value: Any, field: str) -> dict[str, Any]:
@@ -319,7 +338,7 @@ def parse_counter_reading(entry: Any) -> CounterReading:
         reading=parse_decimal(obj.get("sp_pok"), "sp_pok", default=ZERO),
         volume=parse_decimal(obj.get("sp_val"), "sp_val", default=ZERO),
         kind=_optional_str(obj.get("sp_type")),
-        is_actual=obj.get("isActual") is True,
+        is_actual=parse_flag(obj.get("isActual")),
     )
 
 

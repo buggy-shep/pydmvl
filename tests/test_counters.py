@@ -5,6 +5,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 import httpx
+import pytest
 from conftest import LOGIN, PASSWORD, json_response, make_client, synthetic_session_payload
 
 from pydmvl import Counter, CounterReading, DmvlClient
@@ -97,6 +98,48 @@ def test_missing_reading_amounts_degrade_to_zero() -> None:
     assert parsed.reading == Decimal(0)
     assert parsed.volume == Decimal(0)
     assert parsed.kind is None
+
+
+@pytest.mark.parametrize("value", [True, 1, 2, "true", "1", " TRUE "])
+def test_is_actual_accepts_truthy_representations(value: object) -> None:
+    payload = synthetic_session_payload()
+    payload["counters"][0]["values"][0]["isActual"] = value
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+
+    reading = session.counters[0].readings[0]
+    assert reading.is_actual is True
+    assert session.counters[0].current_reading is reading
+
+
+@pytest.mark.parametrize("value", [False, 0, "false", "0", "", "no", None, [], {}])
+def test_is_actual_rejects_non_truthy_representations(value: object) -> None:
+    payload = synthetic_session_payload()
+    payload["counters"][0]["values"][0]["isActual"] = value
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+
+    reading = session.counters[0].readings[0]
+    assert reading.is_actual is False
+    assert session.counters[0].current_reading is None
+
+
+def test_current_reading_selects_coerced_actual() -> None:
+    payload = synthetic_session_payload()
+    payload["counters"][0]["values"][0]["isActual"] = 1
+    payload["counters"][0]["values"].append(
+        {
+            "sp_date_b": "01.10.2026",
+            "sp_date_e": "31.10.2026",
+            "sp_pok": "130",
+            "sp_val": "7",
+            "sp_type": "water",
+            "isActual": False,
+        }
+    )
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+
+    current = session.counters[0].current_reading
+    assert current is not None
+    assert current.reading == Decimal("123")
 
 
 def test_missing_counters_array_is_empty() -> None:
