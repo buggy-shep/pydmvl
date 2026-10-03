@@ -1,4 +1,4 @@
-"""Parsed account models and pure payload parsers (specs 0002, 0003, 0006, 0007).
+"""Parsed account models and pure payload parsers (specs 0002, 0003, 0006, 0007, 0008).
 
 All parsers are pure and raise ``ValueError``/``KeyError``/``TypeError`` on
 malformed input; the client maps those to :class:`~pydmvl.errors.ApiError`
@@ -42,6 +42,12 @@ def _optional_str(value: Any) -> str | None:
     return value if isinstance(value, str) else None
 
 
+def _optional_int(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
 def _object(value: Any, field: str) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValueError(f"field {field!r} is not an object")
@@ -67,6 +73,34 @@ class OutstandingPayment:
 
     amount: Decimal
     tax: Decimal
+
+
+@dataclass(frozen=True)
+class PaymentSegment:
+    """One amount-due segment by payment channel (spec 0008 R1).
+
+    This is the "amount due by channel" breakdown from the ``getpayments``
+    action, not a payment history entry (spec 0003). ``provider`` is the
+    ``payment_header`` label; ``input`` is the ``payment_input`` amount.
+    """
+
+    payment_id: int | None
+    provider: str | None
+    button: str | None
+    amount: Decimal
+    tax: Decimal
+    tax_amount: Decimal
+    input: Decimal
+
+
+@dataclass(frozen=True)
+class PaymentOptions:
+    """The ``getpayments`` response: amount-due segments and options (spec 0008)."""
+
+    count: int
+    segments: tuple[PaymentSegment, ...]
+    text: str | None
+    hide_sum_with_tax: bool
 
 
 @dataclass(frozen=True)
@@ -225,6 +259,39 @@ def parse_outstanding_payment(entry: Any) -> OutstandingPayment:
     return OutstandingPayment(
         amount=parse_decimal(obj.get("sum"), "sum", default=ZERO),
         tax=parse_decimal(obj.get("tax"), "tax", default=ZERO),
+    )
+
+
+def parse_payment_segment(entry: Any) -> PaymentSegment:
+    """Parse one ``payments[]`` entry of a ``getpayments`` response (spec 0008)."""
+    obj = _object(entry, "payment segment")
+    return PaymentSegment(
+        payment_id=_optional_int(obj.get("payment_id")),
+        provider=_optional_str(obj.get("payment_header")),
+        button=_optional_str(obj.get("payment_button")),
+        amount=parse_decimal(obj.get("payment_sum"), "payment_sum", default=ZERO),
+        tax=parse_decimal(obj.get("payment_tax"), "payment_tax", default=ZERO),
+        tax_amount=parse_decimal(obj.get("payment_taxsum"), "payment_taxsum", default=ZERO),
+        input=parse_decimal(obj.get("payment_input"), "payment_input", default=ZERO),
+    )
+
+
+def parse_payment_options(payload: Any) -> PaymentOptions:
+    """Parse a ``getpayments`` response into :class:`PaymentOptions` (spec 0008).
+
+    Parsing is defensive: a missing or non-list ``payments`` value is empty, a
+    missing/malformed ``count`` falls back to the number of parsed segments, and
+    optional fields degrade to ``None``/``False``/zero. Only a non-object top
+    level or a present non-numeric amount raises.
+    """
+    obj = _object(payload, "payment options")
+    segments = tuple(parse_payment_segment(entry) for entry in _objects(obj.get("payments")))
+    count = _optional_int(obj.get("count"))
+    return PaymentOptions(
+        count=count if count is not None else len(segments),
+        segments=segments,
+        text=_optional_str(obj.get("payment_text")),
+        hide_sum_with_tax=obj.get("hideSumWithTax") is True,
     )
 
 

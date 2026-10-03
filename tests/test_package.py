@@ -20,6 +20,8 @@ PUBLIC_API = {
     "DmvlError",
     "OutstandingPayment",
     "Payment",
+    "PaymentOptions",
+    "PaymentSegment",
     "Receipt",
     "Session",
     "password_hash",

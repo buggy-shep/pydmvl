@@ -29,8 +29,10 @@ sensor. The outstanding block supports the unpaid indicator from spec 0002.
 
 - Order in the history is taken as given; the library does not sort by date
   (dates are locale-formatted strings of unknown format).
-- Payment history comes from the snapshot; the `getpayments` action is not
-  used (its response shape has not been observed).
+- Payment history comes only from the snapshot
+  (`personal_account.payments[]`). The `getpayments` action returns the
+  "amount due by channel" breakdown, not history, and is specified separately in
+  spec 0008.
 
 ## API
 
@@ -66,7 +68,8 @@ class Session:
 
 - Creating payment links (`addpayment`) and payment providers.
 - Payment statuses (the payload exposes no status field).
-- The `getpayments` action.
+- The `getpayments` amount-due segments (spec 0008); this spec covers payment
+  history only.
 
 ## Status
 

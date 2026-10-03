@@ -23,9 +23,10 @@ same models and semantics.
   `receipts: tuple[Receipt, ...]`, `outstanding: tuple[OutstandingPayment,
   ...]`, plus the derived `has_unpaid_documents` and `last_payment`.
 - R2 (MUST) `DmvlClient` and `AsyncDmvlClient` expose the same methods:
-  `login(login, password)`, `fetch()`, `logout()`, `close()`. The async client
-  additionally supports `async with` (closing on exit); the sync client
-  supports `with`.
+  `login(login, password)`, `fetch()`, `payment_segments()`, `logout()`,
+  `close()`. The async client additionally supports `async with` (closing on
+  exit); the sync client supports `with`. `payment_segments()` is read-only
+  (spec 0008) and requires a prior `login()`.
 - R3 (MUST) Both clients accept `base_url`, `version`, `transport`, `timeout`,
   and `verify` keyword arguments with the same defaults as spec 0001.
 - R4 (MUST) Errors: `DmvlError` (base), `AuthError` (authentication), `ApiError`

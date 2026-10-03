@@ -38,7 +38,7 @@ not implemented, usually a writing action.
 | `generatecode` | Set a quick access code | out of scope |
 | `deleteaccount` | Delete the account record | out of scope |
 | `getversion` | Application update gate | out of scope |
-| `getpayments` | Charges/payments list (response shape not observed) | out of scope |
+| `getpayments` | Amount due by payment channel (segments: provider, button, amount, tax) | implemented |
 | `addpayment` | Create a payment link or QR code | out of scope |
 | `addcounter` | Submit a meter reading | out of scope |
 | `delcounter` | Delete a meter reading | out of scope |
@@ -64,8 +64,10 @@ not implemented, usually a writing action.
 
 ## Design
 
-- The implemented scope is exactly the `authentication` action, parsed by
-  specs 0002 (documents), 0003 (payments) and 0006 (counters, read-only).
+- The implemented scope is the `authentication` action, parsed by specs 0002
+  (documents), 0003 (payment history), 0006 (counters, read-only), and 0007
+  (account info), plus the read-only `getpayments` action (amount-due segments,
+  spec 0008). `getpayments` is read-only and does not create a payment.
 - All other actions are intentionally unimplemented; most write state and are
   out of scope for a read-only client.
 
@@ -91,4 +93,5 @@ Not applicable: this spec defines no public API of its own.
 
 ## Status
 
-`implemented` (2026-10-01: catalogue for the 0.1.0 scope).
+`implemented` (2026-10-01: catalogue for the 0.1.0 scope; 2026-10-03:
+`getpayments` amount-due segments implemented in 0.4.0, spec 0008).

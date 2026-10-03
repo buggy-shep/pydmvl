@@ -113,7 +113,8 @@ class AccountSummary:
 ## Out of scope
 
 - Downloading receipts or rendering PDFs.
-- The `getpayments` action (unobserved response shape; may be a future spec).
+- The `getpayments` action (amount-due segments; specified separately in spec
+  0008).
 - Charges grouped by service (`details_charges[]`).
 
 ## Status

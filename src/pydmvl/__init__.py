@@ -17,11 +17,13 @@ from .models import (
     CounterReading,
     OutstandingPayment,
     Payment,
+    PaymentOptions,
+    PaymentSegment,
     Receipt,
     Session,
 )
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "AccountInfo",
@@ -37,6 +39,8 @@ __all__ = [
     "DmvlError",
     "OutstandingPayment",
     "Payment",
+    "PaymentOptions",
+    "PaymentSegment",
     "Receipt",
     "Session",
     "__version__",

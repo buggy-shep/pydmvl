@@ -13,10 +13,12 @@ from ._api import (
     DEFAULT_VERIFY,
     auth_params,
     parse_authentication_response,
+    parse_payment_options_response,
+    payment_params,
 )
 from .auth import Credentials
 from .errors import AuthError
-from .models import Session
+from .models import PaymentOptions, Session
 
 LOGGER = logging.getLogger(__name__)
 
@@ -68,6 +70,22 @@ class DmvlClient:
     def logout(self) -> None:
         """Forget the stored credentials."""
         self._credentials = None
+
+    def payment_segments(self) -> PaymentOptions:
+        """Return the amount-due segments from ``getpayments`` (spec 0008 R3).
+
+        Requires a prior :meth:`login`; the request is read-only.
+        """
+        credentials = self._credentials
+        if credentials is None:
+            raise AuthError("not logged in; call login() first")
+        LOGGER.debug("fetching payment segments")
+        response = self._client.get(
+            API_PATH,
+            params=payment_params(credentials, self._version),
+            headers={"Accept": "application/json"},
+        )
+        return parse_payment_options_response(response)
 
     def close(self) -> None:
         """Release the underlying httpx client; idempotent."""

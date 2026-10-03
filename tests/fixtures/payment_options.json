@@ -1,0 +1,26 @@
+{
+  "isService": false,
+  "count": 2,
+  "payments": [
+    {
+      "payment_id": 101,
+      "payment_header": "<provider>",
+      "payment_button": "Pay",
+      "payment_input": 0,
+      "payment_sum": 1250.75,
+      "payment_tax": 0,
+      "payment_taxsum": 0.0
+    },
+    {
+      "payment_id": 202,
+      "payment_header": "<provider two>",
+      "payment_button": "Pay",
+      "payment_input": 1250,
+      "payment_sum": 1250.75,
+      "payment_tax": 1,
+      "payment_taxsum": 12.5
+    }
+  ],
+  "payment_text": "<payment text>",
+  "hideSumWithTax": true
+}
