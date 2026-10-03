@@ -13,13 +13,15 @@ from .models import (
     AccountInfo,
     AccountSummary,
     Charge,
+    Counter,
+    CounterReading,
     OutstandingPayment,
     Payment,
     Receipt,
     Session,
 )
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "AccountInfo",
@@ -28,6 +30,8 @@ __all__ = [
     "AsyncDmvlClient",
     "AuthError",
     "Charge",
+    "Counter",
+    "CounterReading",
     "Credentials",
     "DmvlClient",
     "DmvlError",

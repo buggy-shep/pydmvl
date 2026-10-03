@@ -1,19 +1,19 @@
 # 0006 — Counters (read)
 
-- **Status:** draft
+- **Status:** implemented
 - **Scope:** `pydmvl` parsing of meter counters and readings from the account
   snapshot
 
 ## Summary
 
 The account snapshot includes the account's meters and their readings. This
-spec defines a read-only counter model. It is not implemented in the 0.1.0
-scope; it is recorded here as the next read-only deliverable.
+spec defines a read-only counter model. It was deferred from the 0.1.0 scope and
+is implemented as of 0.3.0.
 
 ## Motivation
 
 Meter readings are useful for Home Assistant, but the 0.1.0 scope is limited to
-authentication, documents, and payments. This spec parks the read-only model
+authentication, documents, and payments. This spec adds the read-only model
 without committing to writing readings.
 
 ## Requirements
@@ -35,8 +35,10 @@ without committing to writing readings.
 
 ## Design
 
-- Parsing is pure and lives in `models.py`; `Session` would expose `counters:
+- Parsing is pure and lives in `models.py`; `Session` exposes `counters:
   tuple[Counter, ...]`.
+- `AccountInfo.counters` stays the array length (spec 0007 R2); it is derived
+  from the parsed counters, so the two never disagree.
 
 ## API
 
@@ -80,4 +82,7 @@ class Counter:
 
 ## Status
 
-`draft` — implementation pending approval, after the 0.1.0 scope is stable.
+`implemented` (2026-10-03) — `Session.counters: tuple[Counter, ...]` with
+`Counter`/`CounterReading` exported from the package; `Counter.current_reading`
+selects the actual reading; missing values degrade to zero/`None`; version
+0.3.0.

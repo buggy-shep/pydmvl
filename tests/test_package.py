@@ -13,6 +13,8 @@ PUBLIC_API = {
     "AsyncDmvlClient",
     "AuthError",
     "Charge",
+    "Counter",
+    "CounterReading",
     "Credentials",
     "DmvlClient",
     "DmvlError",

@@ -67,9 +67,9 @@ explicit opt-in control. See [spec 0004](specs/0004-client-api.md) R8.
 ## Status
 
 Authentication, the account snapshot, documents (charges, receipts, unpaid
-detection), and payment history are implemented (specs 0001–0004); `0.x` — the
-API may still change. See [`specs/`](specs/) for the specifications and their
-status.
+detection), payment history, account metadata, and meter counters (read-only)
+are implemented (specs 0001–0007); `0.x` — the API may still change. See
+[`specs/`](specs/) for the specifications and their status.
 
 Capabilities:
 
@@ -79,6 +79,10 @@ Capabilities:
   [spec 0002](specs/0002-documents.md)
 - Per-period charges and receipt links — [spec 0002](specs/0002-documents.md)
 - Payment history and the latest payment — [spec 0003](specs/0003-payments.md)
+- Account metadata (organization, address, contacts, settings, counts) —
+  [spec 0007](specs/0007-account-info.md)
+- Meter counters and their readings (read-only; submit/delete out of scope) —
+  [spec 0006](specs/0006-counters-read.md)
 - Public sync + async client API — [spec 0004](specs/0004-client-api.md)
 - Configurable TLS verification (default off; see below) — [spec 0004](specs/0004-client-api.md) R8
 

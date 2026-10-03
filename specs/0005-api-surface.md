@@ -65,8 +65,7 @@ not implemented, usually a writing action.
 ## Design
 
 - The implemented scope is exactly the `authentication` action, parsed by
-  specs 0002 (documents) and 0003 (payments). Counters are present in the
-  response but are a separate future spec (0006, draft).
+  specs 0002 (documents), 0003 (payments) and 0006 (counters, read-only).
 - All other actions are intentionally unimplemented; most write state and are
   out of scope for a read-only client.
 

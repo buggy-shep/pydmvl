@@ -1,4 +1,4 @@
-"""Parsed account models and pure payload parsers (specs 0002, 0003, 0007).
+"""Parsed account models and pure payload parsers (specs 0002, 0003, 0006, 0007).
 
 All parsers are pure and raise ``ValueError``/``KeyError``/``TypeError`` on
 malformed input; the client maps those to :class:`~pydmvl.errors.ApiError`
@@ -121,6 +121,41 @@ class AccountSummary:
 
 
 @dataclass(frozen=True)
+class CounterReading:
+    """One meter reading for a period (spec 0006 R2)."""
+
+    period_start: str | None
+    period_end: str | None
+    reading: Decimal
+    volume: Decimal
+    kind: str | None
+    is_actual: bool
+
+
+@dataclass(frozen=True)
+class Counter:
+    """A meter with its reading history (spec 0006 R1).
+
+    Reading is strictly read-only: submitting or deleting a reading is out of
+    scope (spec 0006 R4).
+    """
+
+    name: str
+    serial: str
+    service: str | None
+    checked: str | None
+    readings: tuple[CounterReading, ...]
+
+    @property
+    def current_reading(self) -> CounterReading | None:
+        """The reading marked actual, or ``None`` when none is (spec 0006 R3)."""
+        for reading in self.readings:
+            if reading.is_actual:
+                return reading
+        return None
+
+
+@dataclass(frozen=True)
 class AccountInfo:
     """Account-screen metadata from the authentication response (spec 0007).
 
@@ -160,6 +195,7 @@ class Session:
     charges: tuple[Charge, ...]
     receipts: tuple[Receipt, ...]
     outstanding: tuple[OutstandingPayment, ...]
+    counters: tuple[Counter, ...]
     # Excluded from repr: repr(AccountInfo) already excludes the raw payload.
     account: AccountInfo = field(repr=False)
 
@@ -207,6 +243,32 @@ def parse_charge(entry: Any) -> Charge:
     )
 
 
+def parse_counter_reading(entry: Any) -> CounterReading:
+    """Parse one ``values[]`` entry (spec 0006 R2)."""
+    obj = _object(entry, "counter reading")
+    return CounterReading(
+        period_start=_optional_str(obj.get("sp_date_b")),
+        period_end=_optional_str(obj.get("sp_date_e")),
+        reading=parse_decimal(obj.get("sp_pok"), "sp_pok", default=ZERO),
+        volume=parse_decimal(obj.get("sp_val"), "sp_val", default=ZERO),
+        kind=_optional_str(obj.get("sp_type")),
+        is_actual=obj.get("isActual") is True,
+    )
+
+
+def parse_counter(entry: Any) -> Counter:
+    """Parse one ``counters[]`` entry (spec 0006 R1)."""
+    obj = _object(entry, "counter")
+    readings = tuple(parse_counter_reading(item) for item in _objects(obj.get("values")))
+    return Counter(
+        name=_optional_str(obj.get("sch_name")) or "",
+        serial=_optional_str(obj.get("sch_id")) or "",
+        service=_optional_str(obj.get("st_name")),
+        checked=_optional_str(obj.get("sch_date_c")),
+        readings=readings,
+    )
+
+
 def _parse_receipts(entries: Any, *, kind: str) -> list[Receipt]:
     receipts: list[Receipt] = []
     for entry in _objects(entries):
@@ -240,6 +302,7 @@ def parse_account_info(
     *,
     charges: tuple[Charge, ...],
     receipts: tuple[Receipt, ...],
+    counters: tuple[Counter, ...],
 ) -> AccountInfo:
     """Parse the account-screen metadata from an authentication payload (0007)."""
     obj = _object(payload, "response")
@@ -263,7 +326,7 @@ def parse_account_info(
         settings=dict(settings),
         charges=len(charges),
         receipts=len(receipts),
-        counters=len(_objects(obj.get("counters"))),
+        counters=len(counters),
         payments=len(_objects(obj.get("payments"))),
         news=len(_objects(obj.get("news"))),
         raw=obj,
@@ -284,7 +347,10 @@ def parse_session(payload: Any, *, login: str) -> Session:
         *_parse_receipts(obj.get("cap_bills"), kind=RECEIPT_KIND_CAPITAL_REPAIR),
     ]
     outstanding = tuple(parse_outstanding_payment(entry) for entry in _objects(obj.get("payments")))
-    account = parse_account_info(payload, charges=charges, receipts=tuple(receipts))
+    counters = tuple(parse_counter(entry) for entry in _objects(obj.get("counters")))
+    account = parse_account_info(
+        payload, charges=charges, receipts=tuple(receipts), counters=counters
+    )
     return Session(
         login=login,
         name=_optional_str(obj.get("name")),
@@ -293,5 +359,6 @@ def parse_session(payload: Any, *, login: str) -> Session:
         charges=charges,
         receipts=tuple(receipts),
         outstanding=outstanding,
+        counters=counters,
         account=account,
     )
