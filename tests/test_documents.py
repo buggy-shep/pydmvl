@@ -23,20 +23,31 @@ def test_charges_are_parsed_in_order() -> None:
     assert [charge.date for charge in session.charges] == ["09.2026", "10.2026"]
     first = session.charges[0]
     assert first.charged == Decimal("1800.00")
-    assert first.paid == Decimal("1800.00")
-    assert first.debt_closing == Decimal("100.00")
+    assert first.charged_adjusted == Decimal("1750.00")
+    assert first.paid == Decimal("1750.00")
+    assert first.debt_closing == Decimal("-100.00")
 
 
-def test_charge_is_paid_rule() -> None:
+def test_charge_is_paid_uses_adjusted_charge() -> None:
     session = _client_for(synthetic_session_payload()).login(LOGIN, PASSWORD)
+    # First charge: paid == ist_nach100 (< ist_nach) -> paid (spec 0010 R2).
     assert session.charges[0].is_paid is True
     assert session.charges[1].is_paid is False
+
+
+def test_charge_not_paid_when_adjusted_exceeds_paid() -> None:
+    payload = synthetic_session_payload()
+    # paid == charged, but the correction raises the amount due: unpaid.
+    payload["history_charges"][0]["ist_nach100"] = "1850.00"
+    payload["history_charges"][0]["ist_opl"] = "1800.00"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.charges[0].is_paid is False
 
 
 def test_account_summary_has_debt_rule() -> None:
     session = _client_for(synthetic_session_payload()).login(LOGIN, PASSWORD)
     summary = session.personal_account
-    assert summary.debt_current == Decimal("150.50")
+    assert summary.debt_current == Decimal("-150.50")
     assert summary.has_debt is True
     assert summary.period == "01.10.2026"
     assert summary.payment_purpose == "for utilities"
@@ -45,6 +56,13 @@ def test_account_summary_has_debt_rule() -> None:
 def test_has_debt_false_when_no_current_debt() -> None:
     payload = synthetic_session_payload()
     payload["personal_account"]["all_debt_c"] = "0.00"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.personal_account.has_debt is False
+
+
+def test_has_debt_false_when_overpaid() -> None:
+    payload = synthetic_session_payload()
+    payload["personal_account"]["all_debt_c"] = "50.00"
     session = _client_for(payload).login(LOGIN, PASSWORD)
     assert session.personal_account.has_debt is False
 
@@ -88,6 +106,26 @@ def test_has_unpaid_documents_false_when_all_paid() -> None:
     payload["history_charges"][1]["ist_opl"] = "2200.00"
     session = _client_for(payload).login(LOGIN, PASSWORD)
     assert session.has_unpaid_documents is False
+
+
+def test_has_unpaid_documents_true_from_debt_only() -> None:
+    # Every charge is settled, but the signed balance still shows debt.
+    payload = synthetic_session_payload()
+    payload["history_charges"][1]["ist_opl"] = "2200.00"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.personal_account.has_debt is True
+    assert all(charge.is_paid for charge in session.charges)
+    assert session.has_unpaid_documents is True
+
+
+def test_has_unpaid_documents_true_from_charge_only() -> None:
+    # No account-level debt, but one period is not settled.
+    payload = synthetic_session_payload()
+    payload["personal_account"]["all_debt_c"] = "0"
+    session = _client_for(payload).login(LOGIN, PASSWORD)
+    assert session.personal_account.has_debt is False
+    assert session.charges[1].is_paid is False
+    assert session.has_unpaid_documents is True
 
 
 def test_malformed_charge_raises_api_error() -> None:

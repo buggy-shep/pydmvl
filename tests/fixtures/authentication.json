@@ -5,12 +5,12 @@
   "db": "kp_example",
   "mgfkey": "<mgfkey>",
   "personal_account": {
-    "all_debt_b": "100.00",
-    "all_debt_c": "150.50",
-    "all_debt_e": "0.00",
+    "all_debt_b": "-100.00",
+    "all_debt_c": "-150.50",
+    "all_debt_e": "-150.50",
     "all_nach": "4000.00",
     "all_opl": "3849.50",
-    "all_raz": "150.50",
+    "all_raz": "-150.50",
     "fun_date": "01.10.2026",
     "textOplUsl": "for utilities",
     "payments": [
@@ -28,22 +28,22 @@
     {
       "ist_date": "09.2026",
       "ist_nach": "1800.00",
-      "ist_nach100": "1800.00",
+      "ist_nach100": "1750.00",
       "ist_lgot": "0",
-      "ist_raz": "0",
-      "ist_opl": "1800.00",
-      "ist_debt_b": "100.00",
-      "ist_debt_e": "100.00"
+      "ist_raz": "-50.00",
+      "ist_opl": "1750.00",
+      "ist_debt_b": "-100.00",
+      "ist_debt_e": "-100.00"
     },
     {
       "ist_date": "10.2026",
       "ist_nach": "2200.00",
       "ist_nach100": "2200.00",
       "ist_lgot": "0",
-      "ist_raz": "150.50",
+      "ist_raz": "0",
       "ist_opl": "0.00",
-      "ist_debt_b": "100.00",
-      "ist_debt_e": "250.50"
+      "ist_debt_b": "-100.00",
+      "ist_debt_e": "-2300.00"
     }
   ],
   "bills": [

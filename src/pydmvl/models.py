@@ -137,8 +137,8 @@ class Charge:
 
     @property
     def is_paid(self) -> bool:
-        """Whether the charged amount has been fully paid (spec 0002 R4)."""
-        return self.paid >= self.charged
+        """Whether the adjusted charge has been fully paid (spec 0010 R2)."""
+        return self.paid >= self.charged_adjusted
 
 
 @dataclass(frozen=True)
@@ -169,8 +169,13 @@ class AccountSummary:
 
     @property
     def has_debt(self) -> bool:
-        """Whether the current debt is positive (spec 0002 R4)."""
-        return self.debt_current > ZERO
+        """Whether the signed balance means money is owed (spec 0010 R1).
+
+        The account balance is signed: a negative ``debt_current``
+        (``all_debt_c``) means money is owed, zero means nothing due, and a
+        positive value is an overpayment.
+        """
+        return self.debt_current < ZERO
 
 
 @dataclass(frozen=True)

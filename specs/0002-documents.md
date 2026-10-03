@@ -31,9 +31,12 @@ data behind that signal.
 - R3 (MUST) Parse receipt links from `bills[]` and `cap_bills[]` into
   `Receipt(kind, name, link)`, where `kind` is `"utilities"` or
   `"capital_repair"` respectively. A missing `link` is treated as no receipt.
-- R4 (MUST) `Charge.is_paid` is `paid >= charged`; `AccountSummary.has_debt` is
-  `debt_current > 0`. These are documented hypotheses of the unpaid rule
-  (see Notes); they are stable properties, not hard-coded UI logic.
+- R4 (MUST) ~~`Charge.is_paid` is `paid >= charged`; `AccountSummary.has_debt`
+  is `debt_current > 0`.~~ **Superseded by spec 0010 (2026-10-03):**
+  `Charge.is_paid` is `paid >= charged_adjusted`; `AccountSummary.has_debt` is
+  `debt_current < 0`. The original clause was a documented hypothesis of the
+  unpaid rule (see Notes); the properties stay stable and are not hard-coded
+  UI logic.
 - R5 (MUST) `Session.has_unpaid_documents` is `AccountSummary.has_debt or any
   charge is not paid`.
 - R6 (MUST) Amounts are parsed into `decimal.Decimal` from JSON numbers or
@@ -94,7 +97,8 @@ class AccountSummary:
 - Fixture-driven parsing of `history_charges[]`, `personal_account`, `bills[]`,
   and `cap_bills[]`.
 - Edge cases: missing numeric fields default to zero; charges with
-  `paid >= charged` are paid; a blank link yields no receipt.
+  `paid >= charged_adjusted` are paid (spec 0010); a blank link yields no
+  receipt.
 - Non-numeric required values raise `ApiError`.
 
 ## Acceptance criteria
@@ -104,11 +108,13 @@ class AccountSummary:
 
 ## Notes
 
-- The exact unpaid rule is a hypothesis: a single `debt_closing > 0` is not a
-  reliable signal (an observed paid period still carried a closing debt). The
-  rule may be refined by a later spec when more states are available.
-- `charged_adjusted` (`ist_nach100`) semantics are not fully established; it is
-  exposed as a distinct field rather than folded into `charged`.
+- The exact unpaid rule was refined by spec 0010 (2026-10-03): the balance is
+  signed (negative = owed) and a period is settled against the adjusted charge
+  `charged_adjusted` (`ist_nach100`), not the raw `charged`. A single
+  `debt_closing > 0` remains an unreliable signal (an observed paid period
+  still carried a closing debt).
+- `charged_adjusted` (`ist_nach100`) is the charge adjusted by `difference`
+  (`ist_raz`) and is the basis of the paid test since spec 0010.
 
 ## Out of scope
 
